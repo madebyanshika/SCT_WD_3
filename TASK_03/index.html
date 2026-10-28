@@ -1,0 +1,1088 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic-Tac-Toe | Neon Arena</title>
+
+<style>
+:root {
+    --bg: #080c18;
+    --panel: #11182a;
+    --border: #293550;
+    --text: #f1f5ff;
+    --muted: #8d9bb8;
+    --blue: #4de5ff;
+    --purple: #a78bfa;
+    --green: #4ade80;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(ellipse at 10% 10%, #182449, transparent 45%),
+        radial-gradient(ellipse at 90% 90%, #24153d, transparent 40%),
+        var(--bg);
+}
+
+.game-container {
+    width: 100%;
+    max-width: 440px;
+    padding: 30px 25px;
+    border: 1px solid rgba(141, 155, 184, 0.2);
+    border-radius: 25px;
+    background: rgba(17, 24, 42, 0.95);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.6s ease;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    color: var(--blue);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+}
+
+h1 {
+    font-size: 40px;
+    letter-spacing: -1px;
+}
+
+h1 span {
+    color: var(--blue);
+}
+
+.subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.section-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.mode-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #0b1120;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 12px 5px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.mode-btn.active {
+    color: var(--blue);
+    background: rgba(77, 229, 255, 0.1);
+    border-color: rgba(77, 229, 255, 0.3);
+}
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: 1fr 30px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.score-card {
+    padding: 13px 10px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+    transition: 0.25s;
+}
+
+.x-card.active {
+    border-color: var(--blue);
+}
+
+.o-card.active {
+    border-color: var(--purple);
+}
+
+.player-symbol {
+    margin-bottom: 5px;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.x-symbol {
+    color: var(--blue);
+}
+
+.o-symbol {
+    color: var(--purple);
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+}
+
+.player-name {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.player-score {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.turn-badge {
+    display: block;
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.x-card.active .turn-badge {
+    color: var(--blue);
+}
+
+.o-card.active .turn-badge {
+    color: var(--purple);
+}
+
+.score-divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.status-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 10px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(141, 155, 184, 0.15);
+    border-radius: 10px;
+    background: rgba(8, 12, 24, 0.5);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 10px var(--blue);
+}
+
+#statusMessage {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 22px;
+}
+
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: linear-gradient(145deg, #182139, #11182a);
+    color: var(--text);
+    font-size: clamp(42px, 12vw, 62px);
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.cell:not(.taken):hover {
+    border-color: var(--blue);
+    background: rgba(77, 229, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.cell.x {
+    color: var(--blue);
+    text-shadow: 0 0 20px rgba(77, 229, 255, 0.5);
+}
+
+.cell.o {
+    color: var(--purple);
+    text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+}
+
+.cell.taken {
+    cursor: default;
+    animation: pop 0.2s ease;
+}
+
+.cell.winning {
+    border-color: var(--green);
+    background: rgba(74, 222, 128, 0.13);
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.cell:disabled {
+    opacity: 1;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    flex: 1;
+    min-height: 44px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.primary-btn {
+    border: 1px solid var(--blue);
+    background: var(--blue);
+    color: #07111a;
+}
+
+.primary-btn:hover {
+    background: #a0f3ff;
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+}
+
+.secondary-btn:hover {
+    border-color: var(--purple);
+    color: var(--purple);
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    margin-top: 25px;
+    color: #65728f;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.footer-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--purple);
+}
+
+button:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pop {
+    from {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 380px) {
+    .game-container {
+        padding: 22px 15px;
+    }
+
+    .board {
+        gap: 7px;
+    }
+
+    .cell {
+        border-radius: 11px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="game-container">
+
+    <header>
+        <p class="eyebrow">THE ULTIMATE CLASSIC</p>
+        <h1>Tic<span>-</span>Tac<span>-</span>Toe</h1>
+        <p class="subtitle">Think smart. Make your move. Win the game.</p>
+    </header>
+
+    <span class="section-label">GAME MODE</span>
+
+    <div class="mode-toggle">
+        <button class="mode-btn active"
+                data-mode="computer"
+                aria-pressed="true">
+            🤖 vs Computer
+        </button>
+
+        <button class="mode-btn"
+                data-mode="two-player"
+                aria-pressed="false">
+            👥 Two Players
+        </button>
+    </div>
+
+    <section class="scoreboard" aria-label="Scoreboard">
+
+        <div class="score-card x-card active" id="xCard">
+            <div class="player-symbol x-symbol">X</div>
+            <div class="player-info">
+                <span class="player-name" id="xName">YOU</span>
+                <span class="player-score" id="xScore">0</span>
+            </div>
+            <span class="turn-badge" id="xTurn">YOUR TURN</span>
+        </div>
+
+        <div class="score-divider">VS</div>
+
+        <div class="score-card o-card" id="oCard">
+            <div class="player-symbol o-symbol">O</div>
+            <div class="player-info">
+                <span class="player-name" id="oName">COMPUTER</span>
+                <span class="player-score" id="oScore">0</span>
+            </div>
+            <span class="turn-badge" id="oTurn">COMPUTER</span>
+        </div>
+
+    </section>
+
+    <section class="status-section"
+             aria-live="polite"
+             aria-atomic="true">
+
+        <span class="status-dot" id="statusDot"></span>
+
+        <p id="statusMessage">
+            Your turn! Place X on the board.
+        </p>
+
+    </section>
+
+    <section class="board"
+             id="board"
+             role="group"
+             aria-label="Tic-Tac-Toe board">
+
+        <button class="cell" data-index="0" aria-label="Top left, empty"></button>
+        <button class="cell" data-index="1" aria-label="Top center, empty"></button>
+        <button class="cell" data-index="2" aria-label="Top right, empty"></button>
+
+        <button class="cell" data-index="3" aria-label="Middle left, empty"></button>
+        <button class="cell" data-index="4" aria-label="Center, empty"></button>
+        <button class="cell" data-index="5" aria-label="Middle right, empty"></button>
+
+        <button class="cell" data-index="6" aria-label="Bottom left, empty"></button>
+        <button class="cell" data-index="7" aria-label="Bottom center, empty"></button>
+        <button class="cell" data-index="8" aria-label="Bottom right, empty"></button>
+
+    </section>
+
+    <section class="actions">
+        <button class="action-btn primary-btn" id="restartBtn">
+            ↻ Play Again
+        </button>
+
+        <button class="action-btn secondary-btn" id="resetBtn">
+            Reset Scores
+        </button>
+    </section>
+
+    <footer>
+        <span class="footer-dot"></span>
+        <span>MADE FOR STRATEGIC MINDS</span>
+        <span class="footer-dot"></span>
+    </footer>
+
+</main>
+
+<script>
+// ========================================
+// 1. SELECT HTML ELEMENTS
+// ========================================
+
+const cells = document.querySelectorAll(".cell");
+const modeButtons = document.querySelectorAll(".mode-btn");
+
+const statusMessage = document.getElementById("statusMessage");
+const statusDot = document.getElementById("statusDot");
+
+const xScoreDisplay = document.getElementById("xScore");
+const oScoreDisplay = document.getElementById("oScore");
+
+const xName = document.getElementById("xName");
+const oName = document.getElementById("oName");
+
+const xCard = document.getElementById("xCard");
+const oCard = document.getElementById("oCard");
+
+const xTurn = document.getElementById("xTurn");
+const oTurn = document.getElementById("oTurn");
+
+const restartBtn = document.getElementById("restartBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+
+// ========================================
+// 2. GAME STATE
+// ========================================
+
+let board = Array(9).fill("");
+let currentPlayer = "X";
+let gameActive = true;
+let gameMode = "computer";
+let aiTimer = null;
+
+let scores = {
+    X: 0,
+    O: 0
+};
+
+// All eight possible winning combinations.
+const winningCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
+
+
+// ========================================
+// 3. HANDLE CELL CLICKS
+// ========================================
+
+cells.forEach(function(cell) {
+
+    cell.addEventListener("click", function() {
+
+        const index = Number(cell.dataset.index);
+
+        if (!gameActive || board[index] !== "") {
+            return;
+        }
+
+        // Human plays X in computer mode.
+        if (gameMode === "computer" && currentPlayer === "O") {
+            return;
+        }
+
+        makeMove(index, currentPlayer);
+
+    });
+
+});
+
+
+// ========================================
+// 4. MAKE A MOVE
+// ========================================
+
+function makeMove(index, player) {
+
+    if (!gameActive || board[index] !== "") {
+        return;
+    }
+
+    // Save the move in the game state.
+    board[index] = player;
+
+    // Show the symbol on the board.
+    const cell = cells[index];
+
+    cell.textContent = player;
+    cell.classList.add("taken", player.toLowerCase());
+
+    cell.setAttribute(
+        "aria-label",
+        getCellPosition(index) + ", " + player
+    );
+
+    // Check if the game has ended.
+    const result = checkWinner(board);
+
+    if (result !== null) {
+        endGame(result);
+        return;
+    }
+
+    // Switch between X and O.
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+    updateTurn();
+    updateStatus();
+
+    // Let the computer make its move.
+    if (gameMode === "computer" && currentPlayer === "O") {
+        computerMove();
+    }
+
+}
+
+
+// ========================================
+// 5. CHECK WINNER OR DRAW
+// ========================================
+
+function checkWinner(gameBoard) {
+
+    for (const combination of winningCombinations) {
+
+        const [a, b, c] = combination;
+
+        if (
+            gameBoard[a] !== "" &&
+            gameBoard[a] === gameBoard[b] &&
+            gameBoard[b] === gameBoard[c]
+        ) {
+            return {
+                winner: gameBoard[a],
+                combination: combination
+            };
+        }
+
+    }
+
+    // No empty cells means a draw.
+    if (gameBoard.every(cell => cell !== "")) {
+        return {
+            winner: null,
+            combination: []
+        };
+    }
+
+    return null;
+}
+
+
+// ========================================
+// 6. END THE GAME
+// ========================================
+
+function endGame(result) {
+
+    gameActive = false;
+    clearTimeout(aiTimer);
+
+    if (result.winner !== null) {
+
+        const winner = result.winner;
+
+        scores[winner]++;
+
+        // Highlight winning cells.
+        result.combination.forEach(function(index) {
+            cells[index].classList.add("winning");
+        });
+
+        if (gameMode === "computer") {
+
+            statusMessage.textContent =
+                winner === "X"
+                    ? "🎉 Congratulations! You won!"
+                    : "🤖 Computer wins! Try again.";
+
+        } else {
+
+            statusMessage.textContent =
+                "🎉 Player " + winner + " wins!";
+
+        }
+
+        statusDot.style.background = "#4ade80";
+        statusDot.style.boxShadow = "0 0 10px #4ade80";
+
+    } else {
+
+        statusMessage.textContent =
+            "🤝 It's a draw! Well played!";
+
+        statusDot.style.background = "#fbbf24";
+        statusDot.style.boxShadow = "0 0 10px #fbbf24";
+
+    }
+
+    updateScore();
+    updateTurn();
+
+    // Prevent more moves after the game ends.
+    cells.forEach(function(cell) {
+        cell.disabled = true;
+    });
+
+}
+
+
+// ========================================
+// 7. COMPUTER MOVE
+// ========================================
+
+function computerMove() {
+
+    statusMessage.textContent = "🤖 Computer is thinking...";
+
+    clearTimeout(aiTimer);
+
+    aiTimer = setTimeout(function() {
+
+        // Check whether the game was restarted.
+        if (
+            !gameActive ||
+            gameMode !== "computer" ||
+            currentPlayer !== "O"
+        ) {
+            return;
+        }
+
+        const bestIndex = getBestMove();
+
+        if (bestIndex !== -1) {
+            makeMove(bestIndex, "O");
+        }
+
+    }, 400);
+
+}
+
+
+// ========================================
+// 8. MINIMAX AI ALGORITHM
+// ========================================
+
+// The computer plays O; the human plays X.
+// Minimax examines possible future moves and chooses
+// the best move for the computer.
+
+function getBestMove() {
+
+    let bestScore = -Infinity;
+    let bestIndex = -1;
+
+    for (let i = 0; i < 9; i++) {
+
+        if (board[i] === "") {
+
+            // Try a computer move.
+            board[i] = "O";
+
+            const score = minimax(board, 0, false);
+
+            // Undo the trial move.
+            board[i] = "";
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestIndex = i;
+            }
+
+        }
+
+    }
+
+    return bestIndex;
+}
+
+
+function minimax(gameBoard, depth, isMaximizing) {
+
+    const result = checkWinner(gameBoard);
+
+    if (result !== null) {
+
+        if (result.winner === "O") {
+            return 10 - depth;
+        }
+
+        if (result.winner === "X") {
+            return depth - 10;
+        }
+
+        return 0;
+    }
+
+    if (isMaximizing) {
+
+        // Computer tries to maximize its score.
+        let bestScore = -Infinity;
+
+        for (let i = 0; i < 9; i++) {
+
+            if (gameBoard[i] === "") {
+
+                gameBoard[i] = "O";
+
+                const score = minimax(
+                    gameBoard,
+                    depth + 1,
+                    false
+                );
+
+                gameBoard[i] = "";
+
+                bestScore = Math.max(bestScore, score);
+            }
+
+        }
+
+        return bestScore;
+
+    } else {
+
+        // Human tries to minimize the computer's score.
+        let bestScore = Infinity;
+
+        for (let i = 0; i < 9; i++) {
+
+            if (gameBoard[i] === "") {
+
+                gameBoard[i] = "X";
+
+                const score = minimax(
+                    gameBoard,
+                    depth + 1,
+                    true
+                );
+
+                gameBoard[i] = "";
+
+                bestScore = Math.min(bestScore, score);
+            }
+
+        }
+
+        return bestScore;
+    }
+
+}
+
+
+// ========================================
+// 9. UPDATE SCORES
+// ========================================
+
+function updateScore() {
+
+    xScoreDisplay.textContent = scores.X;
+    oScoreDisplay.textContent = scores.O;
+
+}
+
+
+// ========================================
+// 10. UPDATE TURN INDICATORS
+// ========================================
+
+function updateTurn() {
+
+    xCard.classList.toggle(
+        "active",
+        gameActive && currentPlayer === "X"
+    );
+
+    oCard.classList.toggle(
+        "active",
+        gameActive && currentPlayer === "O"
+    );
+
+    if (gameMode === "computer") {
+
+        xTurn.textContent =
+            currentPlayer === "X" && gameActive
+                ? "YOUR TURN"
+                : "PLAYER";
+
+        oTurn.textContent =
+            currentPlayer === "O" && gameActive
+                ? "THINKING..."
+                : "COMPUTER";
+
+    } else {
+
+        xTurn.textContent =
+            currentPlayer === "X" && gameActive
+                ? "YOUR TURN"
+                : "PLAYER X";
+
+        oTurn.textContent =
+            currentPlayer === "O" && gameActive
+                ? "YOUR TURN"
+                : "PLAYER O";
+
+    }
+
+    statusDot.style.background =
+        currentPlayer === "X" ? "#4de5ff" : "#a78bfa";
+
+}
+
+
+// ========================================
+// 11. UPDATE STATUS MESSAGE
+// ========================================
+
+function updateStatus() {
+
+    if (!gameActive) {
+        return;
+    }
+
+    if (gameMode === "computer") {
+
+        statusMessage.textContent =
+            currentPlayer === "X"
+                ? "Your turn! Place X on the board."
+                : "Computer is thinking...";
+
+    } else {
+
+        statusMessage.textContent =
+            "Player " + currentPlayer + "'s turn. Make your move!";
+
+    }
+
+}
+
+
+// ========================================
+// 12. CELL POSITION
+// ========================================
+
+function getCellPosition(index) {
+
+    const positions = [
+        "Top left",
+        "Top center",
+        "Top right",
+        "Middle left",
+        "Center",
+        "Middle right",
+        "Bottom left",
+        "Bottom center",
+        "Bottom right"
+    ];
+
+    return positions[index];
+}
+
+
+// ========================================
+// 13. RESTART GAME
+// ========================================
+
+function restartGame() {
+
+    clearTimeout(aiTimer);
+
+    // Clear the board but preserve scores.
+    board = Array(9).fill("");
+
+    currentPlayer = "X";
+    gameActive = true;
+
+    cells.forEach(function(cell, index) {
+
+        cell.textContent = "";
+        cell.disabled = false;
+
+        cell.classList.remove(
+            "taken",
+            "x",
+            "o",
+            "winning"
+        );
+
+        cell.setAttribute(
+            "aria-label",
+            getCellPosition(index) + ", empty"
+        );
+
+    });
+
+    updateTurn();
+    updateStatus();
+
+}
+
+
+// ========================================
+// 14. RESET SCORES
+// ========================================
+
+function resetScores() {
+
+    scores = {
+        X: 0,
+        O: 0
+    };
+
+    updateScore();
+    restartGame();
+
+    statusMessage.textContent = "Scores reset. Let's play!";
+
+}
+
+
+// ========================================
+// 15. CHANGE GAME MODE
+// ========================================
+
+modeButtons.forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        const selectedMode = button.dataset.mode;
+
+        if (selectedMode === gameMode) {
+            return;
+        }
+
+        gameMode = selectedMode;
+
+        // Update selected button.
+        modeButtons.forEach(function(modeButton) {
+
+            const active =
+                modeButton.dataset.mode === gameMode;
+
+            modeButton.classList.toggle("active", active);
+
+            modeButton.setAttribute(
+                "aria-pressed",
+                String(active)
+            );
+
+        });
+
+        // Update player names.
+        if (gameMode === "computer") {
+
+            xName.textContent = "YOU";
+            oName.textContent = "COMPUTER";
+
+        } else {
+
+            xName.textContent = "PLAYER X";
+            oName.textContent = "PLAYER O";
+
+        }
+
+        // Start a new round.
+        restartGame();
+
+    });
+
+});
+
+
+// ========================================
+// 16. BUTTON EVENTS
+// ========================================
+
+restartBtn.addEventListener("click", restartGame);
+resetBtn.addEventListener("click", resetScores);
+
+
+// ========================================
+// 17. START THE GAME
+// ========================================
+
+updateScore();
+updateTurn();
+updateStatus();
+
+</script>
+
+</body>
+</html>
+
